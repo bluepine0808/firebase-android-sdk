@@ -13,7 +13,11 @@
 // limitations under the License.
 
 
-package com.google.firebase.gradle.plugins.measurement
+package com.google.firebase.gradle.plugins.measurement.apksize
+
+import com.google.firebase.gradle.plugins.measurement.enums.ColumnName
+import com.google.firebase.gradle.plugins.measurement.enums.TableName
+import com.google.firebase.gradle.plugins.measurement.reports.TableReport
 
 /** A helper class that generates the human-readable, APK size measurement table. */
 class ApkSizeTableBuilder {
@@ -29,13 +33,10 @@ class ApkSizeTableBuilder {
           throw new IllegalStateException("No sizes added")
         }
 
-        def table = "|------------------        APK Sizes        ------------------|\n"
-        table +=    "|--    project    --|--  build type   --|--  size in bytes  --|\n"
+        def table = new TableReport(tableName: TableName.APK_SIZES,
+                columnNames: [ColumnName.PROJECT, ColumnName.BUILD_TYPE, ColumnName.APK_SIZE])
+        sdkSizes.each { table.addReplaceMeasurement(it) }
 
-        table += sdkSizes.collect {
-            sprintf("|%-19s|%-19s|%-21s|", it.get(0), it.get(1), it.get(2))
-        }.join("\n")
-
-        return table
+        return table.toString()
     }
 }

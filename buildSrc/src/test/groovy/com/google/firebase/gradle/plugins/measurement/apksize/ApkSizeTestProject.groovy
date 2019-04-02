@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//            http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.firebase.gradle.plugins.measurement
+package com.google.firebase.gradle.plugins.measurement.apksize
+
+import com.android.utils.FileUtils
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -22,17 +24,18 @@ import org.gradle.testkit.runner.GradleRunner
 import org.junit.rules.ExternalResource
 import org.junit.rules.TemporaryFolder
 
+
 /** Test rule for creating test Gradle projects for the APK size tooling. */
 class ApkSizeTestProject extends ExternalResource {
 
     private static final String BUILD_GRADLE = """
-        import com.google.firebase.gradle.plugins.measurement.GenerateMeasurementsTask
+        import com.google.firebase.gradle.plugins.measurement.apksize.GenerateMeasurementsTask
         import com.google.firebase.gradle.plugins.measurement.UploadMeasurementsTask
 
         buildscript {
             repositories {
                 google()
-        jcenter()
+                jcenter()
             }
 
             dependencies {
@@ -64,19 +67,19 @@ class ApkSizeTestProject extends ExternalResource {
 
             productFlavors {
                 horseshoe {
-            dimension "apkSize"
-            applicationId "com.google.testapk.horseshoe"
-        }
+                    dimension "apkSize"
+                    applicationId "com.google.testapk.horseshoe"
+                }
 
                 vanilla {
-            dimension "apkSize"
-            applicationId "com.google.testapk.vanilla"
-        }
+                    dimension "apkSize"
+                    applicationId "com.google.testapk.vanilla"
+                }
 
                 furball {
-            dimension "apkSize"
-            applicationId "com.google.testapk.furball"
-        }
+                    dimension "apkSize"
+                    applicationId "com.google.testapk.furball"
+                }
             }
 
             sourceSets {
@@ -154,10 +157,9 @@ class ApkSizeTestProject extends ExternalResource {
         def dest = buildSrc.resolve(src)
 
         Files.createDirectories(dest)
-        Files.list(src)
-            .map { path -> path.getFileName().toString() }
-            .filter { name -> name.endsWith(".groovy") }
-            .forEach { name -> Files.copy(src.resolve(name), dest.resolve(name)) }
+        FileUtils.copyDirectory(src.toFile(), dest.toFile())
+
+        FileUtils.copyFileToDirectory(Paths.get('build.gradle').toFile(), buildSrc.toFile())
     }
 
     /** Creates the fake project files for the temporary project. */

@@ -13,21 +13,16 @@
 // limitations under the License.
 
 
-package com.google.firebase.gradle.plugins.measurement
+package com.google.firebase.gradle.plugins.measurement.apksize
 
 import static org.junit.Assert.assertEquals
 
-import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4.class)
 public class ApkSizeTableBuilderTest {
-
-  private static final String HEADER =
-      "|------------------        APK Sizes        ------------------|\n" +
-      "|--    project    --|--  build type   --|--  size in bytes  --|\n"
 
   @Test(expected = IllegalStateException.class)
   public void toTableString_throwsWhenZeroAdded() {
@@ -37,8 +32,14 @@ public class ApkSizeTableBuilderTest {
 
   @Test
   public void toTableString_withOneMeasurement() {
-    def expected = HEADER +
-        "|firebase foo       |debug              |255000               |"
+
+    def expected = """┌──────────────────────────────────────┐
+│               ApkSizes               │
+├──────────────┬────────────┬──────────┤
+│ project      │ build type │ apk_size │
+├──────────────┼────────────┼──────────┤
+│ firebase foo │ debug      │ 255000   │
+└──────────────┴────────────┴──────────┘"""
 
     def builder = new ApkSizeTableBuilder()
     builder.addApkSize("firebase foo", "debug", 255000)
@@ -48,10 +49,16 @@ public class ApkSizeTableBuilderTest {
 
   @Test
   public void toTableString_withThreeMeasurements() {
-    def expected = HEADER +
-        "|firebase foo       |debug              |255000               |\n" +
-        "|google loo         |release            |4000                 |\n" +
-        "|Appy Snap App      |Snappy             |781000               |"
+
+    def expected = """┌───────────────────────────────────────┐
+│               ApkSizes                │
+├───────────────┬────────────┬──────────┤
+│ project       │ build type │ apk_size │
+├───────────────┼────────────┼──────────┤
+│ firebase foo  │ debug      │ 255000   │
+│ google loo    │ release    │ 4000     │
+│ Appy Snap App │ Snappy     │ 781000   │
+└───────────────┴────────────┴──────────┘"""
 
     def builder = new ApkSizeTableBuilder()
     builder.addApkSize("firebase foo", "debug", 255000)
